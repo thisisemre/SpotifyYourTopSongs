@@ -5,7 +5,7 @@ function setUserDetails(user,json){
     user.setprofileUrl(json.external_urls.spotify);
 };
 
-function setUsersTopItems(user,json){
+function setUsersTopArtist(user,json){
     json.items.forEach(item => {
         item.genres.forEach(genre =>{
             user.addGenre(genre);
@@ -15,5 +15,21 @@ function setUsersTopItems(user,json){
 
 };
 
-export {setUserDetails,setUsersTopItems};
+function setUsersTopTracks(user,json){
+    
+    json.items.forEach(item => {
+        let artistName = "";
+
+        item.artists.forEach(artist =>{
+            user.addArtist(artist.name);
+            artistName +=  artist.name;
+            
+        })
+        user.addTrack(item.name+" by: "+artistName);
+        
+    });
+}
+
+
+export {setUserDetails,setUsersTopArtist,setUsersTopTracks};
 

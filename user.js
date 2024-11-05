@@ -23,13 +23,16 @@ class User {
         return this.topArtists;
     }
     addArtist(artist) {
-        this.topArtists.push(artist);
+        if(!this.topArtists.includes(artist)){
+            this.topArtists.push(artist);
+        }
+        
     };
 
     getTracks() {
         return this.topTracks;
     }
-    addTracks(track) {
+    addTrack(track) {
         this.topTracks.push(track);
     }
 
@@ -58,13 +61,28 @@ class User {
     }
 
     toString() {
-        return `Name: ${this.name}<br>
-        Email: ${this.email}<br>
-        Profile URL: ${this.profileUrl}<br>
-        Top Genres: ${this.topGenres.join(', ')}<br>
-        Top Artists: ${this.topArtists.join(', ')}<br>
-        Top Tracks: ${this.topTracks.join(', ')}`;
+        return `
+            <div>
+                <strong>Name:</strong> ${this.name}<br>
+                <strong>Email:</strong> ${this.email}<br>
+                <strong>Profile URL:</strong> <a href="${this.profileUrl}" target="_blank">${this.profileUrl}</a><br>
+                <strong>Top Genres:</strong>
+                <ul>
+                    ${this.topGenres.map(genre => `<li>${genre}</li>`).join('')}
+                </ul>
+                <strong>Top Artists:</strong>
+                <ul>
+                    ${this.topArtists.map(artist => `<li>${artist}</li>`).join('')}
+                </ul>
+                <strong>Top Tracks:</strong>
+                <ul>
+                    ${this.topTracks.map(track => `<li>${track}</li>`).join('')}
+                </ul>
+            </div>
+        `;
     }
+    
+    
     
 
 }

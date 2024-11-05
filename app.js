@@ -1,8 +1,9 @@
 import express from 'express';
+import session from 'express-session';
 import axios from 'axios';
 import dotenv from "dotenv"
 import User from "./User.js";
-import { setUserDetails,setUsersTopItems } from './spotifyFunctions.js';
+import { setUserDetails,setUsersTopArtist,setUsersTopTracks } from './spotifyFunctions.js';
 
 dotenv.config();
 
@@ -19,6 +20,11 @@ let refreshToken = null;
 const app = express();
 const PORT = 3000;
 
+app.use(session({
+  secret: 'your_secret_key', // Güvenli bir anahtar kullanın
+  resave: false,
+  saveUninitialized: true,
+}));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -79,13 +85,21 @@ app.get("/demo",async(req,res)=>{
     headers:{
       Authorization: `Bearer ${accessToken}`
     }
-   }) 
+   })
+   const topTracks = await axios.get("https://api.spotify.com/v1/me/top/tracks",{
+    headers:{
+      Authorization: `Bearer ${accessToken}`
+    }
+   })
+    
+
 
     setUserDetails(user,person.data);
-    setUsersTopItems(user,topArtists.data);
+    setUsersTopArtist(user,topArtists.data);
+    setUsersTopTracks(user,topTracks.data);
 
+   // res.send(user.toString());
     res.send(user.toString());
-    
   } catch (error) {
     console.error("Error getting token:", error);
     res.send("Error getting token");
