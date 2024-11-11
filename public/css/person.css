@@ -65,6 +65,7 @@ header {
     animation: slide 30s linear infinite;
     width: max-content;
     margin-top: -10px;
+    
 }
 
 .genre-item {
@@ -76,6 +77,7 @@ header {
     white-space: nowrap;
     transition: transform 0.3s;
     cursor: url('/images/spotify-cursor-pointer.svg'), pointer;
+    
 }
 
 .genre-item:hover {

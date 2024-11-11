@@ -1,50 +1,43 @@
 let user = null;
 
-async function getPerson() {
+async function fetchUserData() {
     try {
-        const response = await fetch("/api/person");
-        
+        const response = await fetch('/api/person');
         if (!response.ok) {
-            throw new Error("Network response was not ok " + response.statusText);
+            throw new Error('Failed to fetch user data');
         }
-        
-        user = await response.json();
-        console.log(user);
+        const userData = await response.json();
+        updateUI(userData);
     } catch (error) {
-        console.error("Error fetching user:", error);
+        console.error('Error:', error);
     }
 }
 
-getPerson().then(()=>{
-    document.getElementById("username").innerText = user.name;
-    document.getElementById("profile-image").src = user.imageUrl;
-    const artistList = document.getElementById("top-artists");
-    const genreList = document.getElementById("top-genres");
-    const trackList = document.getElementById("top-tracks");
-    const recommendedList = document.getElementById("recommended-tracks");
+function updateUI(userData) {
+    // Update profile information
+    document.getElementById('profile-image').src = userData.imageUrl;
+    document.getElementById('user-name').textContent = userData.name;
+    document.getElementById('user-email').textContent = userData.email;
 
-    artistList.innerHTML = "";
-    genreList.innerHTML = "";
-    trackList.innerHTML = "";
-    
-    user.topArtists.forEach((artist) => {
-        const li = document.createElement("li");
-        li.innerText = artist;
-        artistList.appendChild(li);
-    });
-    user.topGenres.forEach((genre) => {
-        const li = document.createElement("li");
-        li.innerText = genre;
-        genreList.appendChild(li);
-    });
-    user.topTracks.forEach((track) => {
-        const li = document.createElement("li");
-        li.innerText = track;
-        trackList.appendChild(li);
-    });
+    // Update genres
+    const genreList = document.querySelector('.genre-list');
+    genreList.innerHTML = userData.topGenres
+        .map(genre => `<li class="genre-item">${genre}</li>`)
+        .join('');
 
-    
+    // Update top artists
+    const artistsList = document.getElementById('top-artists');
+    artistsList.innerHTML = userData.topArtists
+        .map(artist => `<li class="track-item">${artist}</li>`)
+        .join('');
 
+    // Update top tracks
+    const tracksList = document.getElementById('top-tracks');
+    tracksList.innerHTML = userData.topTracks
+        .map(track => `<li class="track-item">${track}</li>`)
+        .join('');
+}
 
-});
+// Call this when the page loads
+fetchUserData();
 

@@ -3,45 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Suggestions</title>
-    <link rel="stylesheet" href="/css/person.css">
+    <title>Spotify Profile</title>
+    <link rel="stylesheet" href="css/person.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="user-profile">
-                <img src="" alt="Profile" id="profile-image">
-                <div>
-                    <h1 id="username">Loading...</h1>
-                    <p id="email"></p>
+                <img id="profile-image" src="" alt="Profile Picture">
+                <div class="user-info">
+                    <h1 id="user-name"></h1>
+                    <p id="user-email"></p>
                 </div>
             </div>
             <div class="top-genres">
-                <h2>Your Top Genres</h2>
-                <ul class="genre-list" id="top-genres">
-                    <li class="loading">Loading your top genres...</li>
+                <ul class="genre-list">
+                    <!-- Genres will be inserted here -->
                 </ul>
             </div>
         </header>
 
         <div class="content">
             <div class="section">
-                <h2>Your Top Artists</h2>
-                <ul class="track-list" id="top-artists">
-                    <li class="loading">Loading your top artists...</li>
+                <h2>Top Artists</h2>
+                <ul id="top-artists" class="track-list">
+                    <!-- Artists will be inserted here -->
                 </ul>
             </div>
 
             <div class="section">
-                <h2>Your Top Tracks</h2>
-                <ul class="track-list" id="top-tracks">
-                    <li class="loading">Loading your top tracks...</li>
+                <h2>Top Tracks</h2>
+                <ul id="top-tracks" class="track-list">
+                    <!-- Tracks will be inserted here -->
                 </ul>
             </div>
-
-
         </div>
     </div>
-    <script src="/js/person.js"></script>
+    <script src="js/person.js"></script>
 </body>
 </html> 

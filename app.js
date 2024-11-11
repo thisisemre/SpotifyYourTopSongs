@@ -2,8 +2,6 @@ import express from 'express';
 import session from 'express-session';
 import axios from 'axios';
 import dotenv from "dotenv"
-import User from "./user.js";
-import { setUserDetails,setUsersTopArtist,setUsersTopTracks } from './spotifyFunctions.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -19,15 +17,10 @@ const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
 const secret = process.env.SESSION_SECRET;
 
-const user = new User();
-let accessToken = null; // Kullanıcı için alınan erişim tokeni
-let refreshToken = null;
-
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 
 
 
@@ -44,7 +37,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  if(accessToken){
+  if(req.session.accessToken) {
     res.redirect("/person");
     return;
   }
@@ -77,8 +70,9 @@ app.get("/callback", async (req, res) => {
       }
     });
     
-    accessToken = response.data.access_token;
-    refreshToken = response.data.refresh_token;
+    req.session.accessToken = response.data.access_token;
+    req.session.refreshToken = response.data.refresh_token;
+    
     res.redirect("/person");
   } catch (error) {
     console.error("Error getting token:", error);
@@ -90,7 +84,7 @@ async function refreshAccessToken() {
   try {
     const response = await axios.post("https://accounts.spotify.com/api/token", new URLSearchParams({
       grant_type: "refresh_token",
-      refresh_token: refreshToken,
+      refresh_token: req.session.refreshToken,
       client_id: client_id,
       client_secret: client_secret
     }), {
@@ -99,7 +93,7 @@ async function refreshAccessToken() {
       }
     });
 
-    accessToken = response.data.access_token;
+    req.session.accessToken = response.data.access_token;
     return true;
   } catch (error) {
     console.error("Error refreshing access token:", error);
@@ -108,36 +102,65 @@ async function refreshAccessToken() {
 }
 
 app.get("/api/person", async (req, res) => {
-  if (!accessToken) {
+  if (!req.session.accessToken) {
     res.redirect("/login");
     return;
   }
 
   try {
+    // Fetch user data from Spotify
     const person = await axios.get("https://api.spotify.com/v1/me", {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${req.session.accessToken}`
       }
     });
 
     const topArtists = await axios.get("https://api.spotify.com/v1/me/top/artists", {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${req.session.accessToken}`
       }
     });
 
     const topTracks = await axios.get("https://api.spotify.com/v1/me/top/tracks?limit=40", {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${req.session.accessToken}`
       }
     });
 
-    setUserDetails(user, person.data);
-    setUsersTopArtist(user, topArtists.data);
-    setUsersTopTracks(user, topTracks.data);
+    // Store data directly in session
+    req.session.userData = {
+      name: person.data.display_name,
+      email: person.data.email,
+      profileUrl: person.data.external_urls.spotify,
+      imageUrl: person.data.images[0].url,
+      topGenres: [],
+      topArtists: [],
+      topTracks: []
+    };
 
-    res.send(user.toJSON());
+    // Process top artists
+    topArtists.data.items.forEach(item => {
+      item.genres.forEach(genre => {
+        if (!req.session.userData.topGenres.includes(genre)) {
+          req.session.userData.topGenres.push(genre);
+        }
+      });
+      if (!req.session.userData.topArtists.includes(item.name)) {
+        req.session.userData.topArtists.push(item.name);
+      }
+    });
+
+    // Process top tracks
+    topTracks.data.items.forEach(item => {
+      const artistNames = item.artists.map(artist => artist.name).join(", ");
+      req.session.userData.topTracks.push(`${item.name} by: ${artistNames}`);
+    });
+
+    console.log('Session data:', req.session.userData);
+    res.json(req.session.userData);
+
   } catch (error) {
+    console.error("Detailed error:", error.response?.data || error.message);
     if (error.response && error.response.status === 401) {
       const refreshed = await refreshAccessToken();
       if (refreshed) {
@@ -147,14 +170,14 @@ app.get("/api/person", async (req, res) => {
       }
     } else {
       console.error("Error getting data:", error);
-      res.send("Error getting data");
+      res.status(500).send("Error getting data");
     }
   }
 });
 
 
 app.get("/person", (req, res) => {
-  if (!accessToken) {
+  if (!req.session.accessToken) {
     res.redirect("/login");
     return;
   }
@@ -162,6 +185,14 @@ app.get("/person", (req, res) => {
   res.sendFile(__dirname + "/public/person.html");
 });
 
+// Add this new route to get session data
+app.get("/api/user-data", (req, res) => {
+  if (!req.session.userData) {
+    res.status(404).json({ error: "No user data found" });
+    return;
+  }
+  res.json(req.session.userData);
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
