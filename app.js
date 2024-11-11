@@ -2,7 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import axios from 'axios';
 import dotenv from "dotenv"
-import User from "./User.js";
+import User from "./user.js";
 import { setUserDetails,setUsersTopArtist,setUsersTopTracks } from './spotifyFunctions.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
