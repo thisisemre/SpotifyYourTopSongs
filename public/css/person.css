@@ -194,4 +194,49 @@ h2 {
     100% {
         transform: translateX(-100%);
     }
+}
+
+.github-link {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 10px;
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+}
+
+.github-link p {
+    color: #b3b3b3;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.github-link a {
+    color: #1DB954;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.github-link a:hover {
+    color: #1ed760;
+    text-decoration: underline;
+}
+
+.track-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    transition: color 0.3s;
+}
+
+.track-link:hover {
+    color: #1DB954;
+}
+
+.track-item:hover .track-link {
+    color: #1DB954;
 } 

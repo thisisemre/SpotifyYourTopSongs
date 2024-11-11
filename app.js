@@ -145,15 +145,20 @@ app.get("/api/person", async (req, res) => {
           req.session.userData.topGenres.push(genre);
         }
       });
-      if (!req.session.userData.topArtists.includes(item.name)) {
-        req.session.userData.topArtists.push(item.name);
-      }
+      req.session.userData.topArtists.push({
+        name: item.name,
+        url: item.external_urls.spotify
+      });
     });
 
     // Process top tracks
     topTracks.data.items.forEach(item => {
       const artistNames = item.artists.map(artist => artist.name).join(", ");
-      req.session.userData.topTracks.push(`${item.name} by: ${artistNames}`);
+      req.session.userData.topTracks.push({
+        name: item.name,
+        artists: artistNames,
+        url: item.external_urls.spotify
+      });
     });
 
     console.log('Session data:', req.session.userData);

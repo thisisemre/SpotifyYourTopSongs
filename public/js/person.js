@@ -17,7 +17,6 @@ function updateUI(userData) {
     // Update profile information
     document.getElementById('profile-image').src = userData.imageUrl;
     document.getElementById('user-name').textContent = userData.name;
-    document.getElementById('user-email').textContent = userData.email;
 
     // Update genres
     const genreList = document.querySelector('.genre-list');
@@ -25,16 +24,28 @@ function updateUI(userData) {
         .map(genre => `<li class="genre-item">${genre}</li>`)
         .join('');
 
-    // Update top artists
+    // Update top artists with clickable links
     const artistsList = document.getElementById('top-artists');
     artistsList.innerHTML = userData.topArtists
-        .map(artist => `<li class="track-item">${artist}</li>`)
+        .map(artist => `
+            <li class="track-item">
+                <a href="${artist.url}" target="_blank" class="track-link">
+                    ${artist.name}
+                </a>
+            </li>
+        `)
         .join('');
 
-    // Update top tracks
+    // Update top tracks with clickable links
     const tracksList = document.getElementById('top-tracks');
     tracksList.innerHTML = userData.topTracks
-        .map(track => `<li class="track-item">${track}</li>`)
+        .map(track => `
+            <li class="track-item">
+                <a href="${track.url}" target="_blank" class="track-link">
+                    ${track.name} by: ${track.artists}
+                </a>
+            </li>
+        `)
         .join('');
 }
 
