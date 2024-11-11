@@ -17,6 +17,7 @@ dotenv.config();
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.REDIRECT_URI;
+const secret = process.env.SESSION_SECRET;
 
 const user = new User();
 let accessToken = null; // Kullanıcı için alınan erişim tokeni
@@ -31,7 +32,7 @@ const PORT = process.env.PORT || 3000;
 
 
 app.use(session({
-  secret: 'your_secret_key', // Güvenli bir anahtar kullanın
+  secret:secret, // Güvenli bir anahtar kullanın
   resave: false,
   saveUninitialized: true,
 }));
