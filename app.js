@@ -25,7 +25,7 @@ let refreshToken = null;
 
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 
 
@@ -85,37 +85,69 @@ app.get("/callback", async (req, res) => {
   }
 });
 
-app.get("/api/person",async(req,res)=>{
-  if(!accessToken){
+async function refreshAccessToken() {
+  try {
+    const response = await axios.post("https://accounts.spotify.com/api/token", new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: client_id,
+      client_secret: client_secret
+    }), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      }
+    });
+
+    accessToken = response.data.access_token;
+    return true;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    return false;
+  }
+}
+
+app.get("/api/person", async (req, res) => {
+  if (!accessToken) {
     res.redirect("/login");
     return;
   }
+
   try {
-   const person = await axios.get("https://api.spotify.com/v1/me",{
-    headers:{
-      Authorization: `Bearer ${accessToken}`
-    }
-   })
-   const topArtists = await axios.get("https://api.spotify.com/v1/me/top/artists",{
-    headers:{
-      Authorization: `Bearer ${accessToken}`
-    }
-   })
-   const topTracks = await axios.get("https://api.spotify.com/v1/me/top/tracks?limit=40",{
-    headers:{
-      Authorization: `Bearer ${accessToken}`
-    }
-   })
-    
-    setUserDetails(user,person.data);
-    setUsersTopArtist(user,topArtists.data);
-    setUsersTopTracks(user,topTracks.data);
+    const person = await axios.get("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    const topArtists = await axios.get("https://api.spotify.com/v1/me/top/artists", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    const topTracks = await axios.get("https://api.spotify.com/v1/me/top/tracks?limit=40", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    setUserDetails(user, person.data);
+    setUsersTopArtist(user, topArtists.data);
+    setUsersTopTracks(user, topTracks.data);
 
     res.send(user.toJSON());
   } catch (error) {
-    console.error("Error getting token:", error);
-    res.send("Error getting token");
-  
+    if (error.response && error.response.status === 401) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        return res.redirect("/api/person");
+      } else {
+        res.redirect("/login");
+      }
+    } else {
+      console.error("Error getting data:", error);
+      res.send("Error getting data");
+    }
   }
 });
 
