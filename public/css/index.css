@@ -81,4 +81,49 @@ p {
 .github-link a:hover {
     color: #1ed760;
     text-decoration: underline;
+}
+
+@media screen and (max-width: 768px) {
+    .login-container {
+        width: 90%;
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+
+    .spotify-logo {
+        width: 150px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+
+    .github-link {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .spotify-logo {
+        width: 120px;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
 } 
