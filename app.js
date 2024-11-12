@@ -41,7 +41,7 @@ app.get("/login", (req, res) => {
     res.redirect("/person");
     return;
   }
-  const scope = "playlist-modify-public playlist-modify-private user-read-private user-read-email user-read-playback-state user-top-read";
+  const scope = "user-read-private user-read-email user-top-read";
   
   const authUrl = "https://accounts.spotify.com/authorize?" + new URLSearchParams({
     response_type: "code",
